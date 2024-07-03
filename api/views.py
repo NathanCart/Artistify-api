@@ -1,7 +1,7 @@
 from rest_framework import generics
-from .models import Item, Location
+from .models import Item, Location, User
 
-from .serializers import ItemSerializer, LocationSerializer
+from .serializers import ItemSerializer, LocationSerializer, UserSerializer
 
 class ItemList(generics.ListCreateAPIView):
     serializer_class = ItemSerializer
@@ -24,3 +24,11 @@ class LocationList(generics.ListCreateAPIView):
 class LocationDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = LocationSerializer
     queryset = Location.objects.all()
+
+class UserList(generics.ListCreateAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()

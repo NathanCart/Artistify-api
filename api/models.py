@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 
 # Create your models here.
 class Location(models.Model):
@@ -14,3 +15,7 @@ class Item(models.Model):
 
     def __str__(self):
         return self.itemName
+
+class User(models.Model):
+    spotify_id = models.CharField(max_length=100, unique=True)
+    artist_list = ArrayField(models.CharField(max_length=10, blank=True),size=8)
