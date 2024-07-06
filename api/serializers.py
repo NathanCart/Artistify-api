@@ -18,5 +18,6 @@ class UserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.artist_list = validated_data.get('artist_list', instance.artist_list)
+        instance.spotify_id = validated_data.get('spotify_id', instance.spotify_id)
         instance.save()
         return instance

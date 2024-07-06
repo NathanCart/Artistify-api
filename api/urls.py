@@ -7,5 +7,5 @@ urlpatterns = [
     path('location/', LocationList.as_view()),
     path('location/<int:pk>/', LocationDetail.as_view()),
     path('user/', UserApiView.as_view()),
-    path('user/<int:pk>/', UserApiView.as_view())
+    path('user/<str:pk>/', UserApiView.as_view())
 ]

@@ -32,7 +32,10 @@ class UserApiView(APIView):
         if pk:
             # Retrieve a single user
             try:
-                user = User.objects.get(pk=pk)
+                if pk.isnumeric():
+                    user = User.objects.get(pk=pk)
+                else:
+                    user = User.objects.get(spotify_id=pk)
                 serializer = UserSerializer(user)
                 return Response(serializer.data)
             except User.DoesNotExist:
@@ -48,12 +51,27 @@ class UserApiView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
     def put(self, request, pk):
-        user = User.objects.get(pk=pk)
+        if pk.isnumeric():
+            user = User.objects.get(pk=pk)
+        else:
+            user = User.objects.get(spotify_id=pk)
         serializer = UserSerializer(user, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        pk = self.kwargs.get('pk')
+        if pk.isnumeric():
+            user = User.objects.get(pk=pk)
+        else:
+            user = User.objects.get(spotify_id=pk)
+        try:
+            user.delete()
+            return Response({"message": "User deleted"})
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
