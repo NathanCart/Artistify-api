@@ -18,4 +18,6 @@ class Item(models.Model):
 
 class User(models.Model):
     spotify_id = models.CharField(max_length=100, unique=True)
-    artist_list = ArrayField(models.CharField(max_length=10, blank=True),size=8)
+    artist_list = ArrayField(models.CharField(blank=True),null=True, 
+        blank=True, 
+        default=list) 

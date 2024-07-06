@@ -15,3 +15,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('__all__')
+
+    def update(self, instance, validated_data):
+        instance.artist_list = validated_data.get('artist_list', instance.artist_list)
+        instance.save()
+        return instance
