@@ -39,6 +39,8 @@ class UserCurrent(APIView):
                 artistsRequest = requests.get('https://api.spotify.com/v1/artists?ids=' + user_artists, headers={'Authorization': 'Bearer ' + access_token})
                 if artistsRequest.status_code == 200:
                     artists_data = artistsRequest.json()
+                else:
+                    artists_data = {'artists': []}
                 serializer = UserSerializer(user)
                 combined_data = {**serializer.data, 'spotify_data': spotify_data, 'artists': artists_data['artists']}
                 return Response(combined_data)
@@ -56,9 +58,25 @@ class AddArtist(APIView):
         if artist_id in user.artists:
             return Response({"error": "Artist already in list"}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            user.artists.append(artist_id)
+            user.artists.insert(0, artist_id)
             user.save()
             return Response(serializer.data)
+
+class RemoveArtist(APIView):
+    def delete(self, request, *args, **kwargs):
+        spotify_id = request.data['spotifyId']
+        artist_id = request.data['artistId']
+
+        print(spotify_id, artist_id, 'delete data')
+        user = User.objects.get(spotify_id=spotify_id)
+        serializer = UserSerializer(user)
+
+        if artist_id in user.artists:
+            user.artists.remove(artist_id)
+            user.save()
+            return Response(serializer.data)
+        else:
+            return Response({"error": "Artist not in list"}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserApiView(APIView):    
     def get(self, request, *args, **kwargs):
