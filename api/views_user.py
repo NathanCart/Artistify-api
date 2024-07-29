@@ -57,6 +57,35 @@ class RemoveArtist(APIView):
         else:
             return Response({"error": "Artist not in list"}, status=status.HTTP_400_BAD_REQUEST)
 
+class AddFriend(APIView):
+    def post(self, request, *args, **kwargs):
+        spotify_id = request.data['spotifyId']
+        friend_id = request.data['friendId']
+        user = User.objects.get(spotify_id=spotify_id)
+        serializer = UserSerializer(user)
+
+        if friend_id in user.friends:
+            return Response({"error": "Friend already in list"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            user.friends.insert(0, friend_id)
+            user.save()
+            return Response(serializer.data)
+
+class RemoveFriend(APIView):
+    def delete(self, request, *args, **kwargs):
+        spotify_id = request.data['spotifyId']
+        friend_id = request.data['friendId']
+
+        user = User.objects.get(spotify_id=spotify_id)
+        serializer = UserSerializer(user)
+
+        if friend_id in user.friends:
+            user.friends.remove(friend_id)
+            user.save()
+            return Response(serializer.data)
+        else:
+            return Response({"error": "Friend not in list"}, status=status.HTTP_400_BAD_REQUEST)
+
 class UserApiView(APIView):    
     def get(self, request, *args, **kwargs):
         pk = self.kwargs.get('pk')
@@ -73,7 +102,8 @@ class UserApiView(APIView):
                 return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         else:
             # List all users
-            queryset = User.objects.all()
+            search = request.query_params.get('search')
+            queryset = User.objects.filter(display_name__icontains=search)
             serializer = UserSerializer(queryset, many=True)
             return Response(serializer.data)
 
