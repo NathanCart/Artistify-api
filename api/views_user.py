@@ -27,6 +27,15 @@ class UserCurrent(APIView):
                 return Response({"error": "User not found in the database"}, status=status.HTTP_404_NOT_FOUND)
         return Response({"error": "Unable to fetch data from Spotify"}, status=status.HTTP_400_BAD_REQUEST)
 
+class UserFriends(APIView):
+    def get(self, request, *args, **kwargs):
+        spotify_id = self.request.query_params.get('spotifyId')
+        user = User.objects.get(spotify_id=spotify_id)
+        
+        friends = User.objects.filter(id__in=user.friends)
+        serializer = UserSerializer(friends, many=True)
+        return Response(serializer.data)
+    
 class AddArtist(APIView):
     def post(self, request, *args, **kwargs):
         spotify_id = request.data['spotifyId']

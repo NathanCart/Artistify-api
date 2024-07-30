@@ -11,5 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
         instance.display_name = validated_data.get('display_name', instance.display_name)
         instance.friends = validated_data.get('friends', instance.friends)
         instance.spotify_id = validated_data.get('spotify_id', instance.spotify_id)
+        instance.avatar_url = validated_data.get('avatar_url', instance.avatar_url)
+        instance.followers = validated_data.get('followers', instance.followers)
         instance.save()
         return instance
