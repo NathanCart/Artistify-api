@@ -115,11 +115,18 @@ class UserApiView(APIView):
             except User.DoesNotExist:
                 return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         else:
+            print(request.query_params, 'query params data')
             # List all users
+            pagination_class = CustomPagination
+            paginator = pagination_class()
+        # result_page = paginator.paginate_queryset(friends, request)
+        # serializer = UserSerializer(result_page, many=True)
+        # return paginator.get_paginated_response(serializer.data)
             search = request.query_params.get('search')
             queryset = User.objects.filter(display_name__icontains=search)
-            serializer = UserSerializer(queryset, many=True)
-            return Response(serializer.data)
+            result_page = paginator.paginate_queryset(queryset, request)
+            serializer = UserSerializer(result_page, many=True)
+            return paginator.get_paginated_response(serializer.data)
 
     def post(self, request, *args, **kwargs):
         serializer = UserSerializer(data=request.data)
