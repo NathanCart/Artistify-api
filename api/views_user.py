@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from .serializers import UserSerializer
 from rest_framework.response import Response
 import requests
+from .custom_pagination import CustomPagination
 
 
 class UserCurrent(APIView):
@@ -28,13 +29,17 @@ class UserCurrent(APIView):
         return Response({"error": "Unable to fetch data from Spotify"}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserFriends(APIView):
+    
     def get(self, request, *args, **kwargs):
+
         spotify_id = self.request.query_params.get('spotifyId')
         user = User.objects.get(spotify_id=spotify_id)
-        
         friends = User.objects.filter(id__in=user.friends)
-        serializer = UserSerializer(friends, many=True)
-        return Response(serializer.data)
+        pagination_class = CustomPagination
+        paginator = pagination_class()
+        result_page = paginator.paginate_queryset(friends, request)
+        serializer = UserSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
     
 class AddArtist(APIView):
     def post(self, request, *args, **kwargs):
