@@ -6,11 +6,11 @@ class User(models.Model):
     artists = ArrayField(models.CharField(blank=True),null=True,
         blank=True, 
         default=list, 
-        max_length=1000)
+        max_length=255)
     friends = ArrayField(models.IntegerField(blank=True),null=True,
         blank=True,
         default=list,
-        max_length=1000)
+        max_length=255)
     display_name = models.CharField(max_length=100, blank=True)
     avatar_url = models.TextField(blank=True, null=True)
     followers = models.IntegerField(blank=True, null=True)
