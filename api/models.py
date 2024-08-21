@@ -5,10 +5,12 @@ class User(models.Model):
     spotify_id = models.CharField(max_length=100, unique=True)
     artists = ArrayField(models.CharField(blank=True),null=True,
         blank=True, 
-        default=list) 
+        default=list, 
+        max_length=1000)
     friends = ArrayField(models.IntegerField(blank=True),null=True,
         blank=True,
-        default=list)
+        default=list,
+        max_length=1000)
     display_name = models.CharField(max_length=100, blank=True)
     avatar_url = models.TextField(blank=True, null=True)
     followers = models.IntegerField(blank=True, null=True)
