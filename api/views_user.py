@@ -41,6 +41,30 @@ class UserFriends(APIView):
         serializer = UserSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
     
+class UserArtists(APIView):
+    def get(self, request, *args, **kwargs):
+        access_token = self.request.query_params.get('accessToken')
+        r = requests.get('https://api.spotify.com/v1/me', headers={'Authorization': 'Bearer ' + access_token})
+
+        if r.status_code == 200:
+            spotify_data = r.json()
+            print(spotify_data, 'spotify data')
+            try:
+                user = User.objects.get(spotify_id=spotify_data['id'])
+                user_artists = ",".join(user.artists)
+
+                artistsRequest = requests.get('https://api.spotify.com/v1/artists?ids=' + user_artists, headers={'Authorization': 'Bearer ' + access_token})
+                artists_response = artistsRequest.json()
+                pagination_class = CustomPagination
+                paginator = pagination_class()
+                if artistsRequest.status_code == 200:
+                    print('artists response data', artists_response)
+                    artists_data = paginator.paginate_queryset(artists_response['artists'], request)
+                else:
+                    artists_data = paginator.paginate_queryset({'artists': []}, request)
+                return paginator.get_paginated_response(artists_data)
+            except User.DoesNotExist:
+                return Response({"error": "User not found in the database"}, status=status.HTTP_404_NOT_FOUND)
 class AddArtist(APIView):
     def post(self, request, *args, **kwargs):
         spotify_id = request.data['spotifyId']
