@@ -52,7 +52,9 @@ class UserArtists(APIView):
             try:
                 user = User.objects.get(spotify_id=spotify_data['id'])
                 user_artists = ",".join(user.artists)
-
+                if(len(user_artists) == 0):
+                    return Response({'artists': {'results': []}})
+                
                 artistsRequest = requests.get('https://api.spotify.com/v1/artists?ids=' + user_artists, headers={'Authorization': 'Bearer ' + access_token})
                 artists_response = artistsRequest.json()
                 pagination_class = CustomPagination
