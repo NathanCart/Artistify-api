@@ -48,7 +48,6 @@ class UserArtists(APIView):
 
         if r.status_code == 200:
             spotify_data = r.json()
-            print(spotify_data, 'spotify data')
             try:
                 user = User.objects.get(spotify_id=spotify_data['id'])
                 user_artists = ",".join(user.artists)
@@ -131,11 +130,13 @@ class UserApiView(APIView):
         pk = self.kwargs.get('pk')
         if pk:
             # Retrieve a single user
+            print(pk, 'pk data')
             try:
                 if pk.isnumeric():
                     user = User.objects.get(pk=pk)
                 else:
                     user = User.objects.get(spotify_id=pk)
+                print(user, 'user dat')
                 serializer = UserSerializer(user)
                 return Response(serializer.data)
             except User.DoesNotExist:
